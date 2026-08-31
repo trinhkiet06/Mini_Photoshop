@@ -25,7 +25,7 @@ def plot_histogram_color(original: np.ndarray, equalized: np.ndarray):
     for i, col in enumerate(colors):
         hist_orig = cv2.calcHist([original], [i], None, [256], [0, 256])
         axes[1, 0].plot(hist_orig, color=col, label=labels[i])
-        
+
     axes[1, 0].set_title("Histogram ảnh ban đầu")
     axes[1, 0].set_xlim(0, 255)
     axes[1, 0].legend()
@@ -43,13 +43,8 @@ def plot_histogram_color(original: np.ndarray, equalized: np.ndarray):
 def test_image(image_path: str):
     original = cv2.imread(image_path)  # đọc ảnh màu
 
-    if original is None:
-        print(f"Không đọc được ảnh: {image_path}")
-        return
-
     equalized = histogram_color(original)
 
-    print(f"Đang test ảnh: {image_path}")
     plot_histogram_color(original, equalized)
 
 
