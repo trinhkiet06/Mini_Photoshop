@@ -49,7 +49,7 @@ def test_image(image_path: str):
 
 
 if __name__ == "__main__":
-    image_paths = ["Data/anh10.png", "Data/anh11.png"]
+    image_paths = ["Data/anh11.png"]
 
     for path in image_paths:
         test_image(path)
