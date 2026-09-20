@@ -7,18 +7,23 @@ import io
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+from Processing.blur import blur_color
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QHBoxLayout, QFileDialog
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QImage
 
 from GUI.panels1 import ControlPanel, DisplayPanel, STYLE_SHEET
 
+# Giả sử các hàm xử lý thuật toán của bạn nằm trong package Processing
+# Ví dụ: from Processing.enhancement import adjust_brightness_contrast, apply_blur, equalize_histogram
+
+
 class MiniPhotoshop(QMainWindow):
     def __init__(self):
         super().__init__()
         # Áp dụng giao diện tối cho toàn bộ cửa sổ
         self.setStyleSheet(STYLE_SHEET)
-        
+
         self.original_cv_img = None
         self.processed_cv_img = None
         self.initUI()
@@ -41,7 +46,8 @@ class MiniPhotoshop(QMainWindow):
         # KẾT NỐI SỰ KIỆN CÁC THANH SLIDER VÀ BUTTON VỚI THUẬT TOÁN XỬ LÝ
         self.control_panel.slider_bright.valueChanged.connect(self.apply_processing)
         self.control_panel.slider_contrast.valueChanged.connect(self.apply_processing)
-        self.control_panel.slider_blur.valueChanged.connect(self.apply_processing)
+        self.control_panel.slider_blur_size.valueChanged.connect(self.apply_processing)
+        self.control_panel.slider_blur_sigma.valueChanged.connect(self.apply_processing)
         self.control_panel.btn_hist.clicked.connect(self.apply_processing)
 
          # KHU VỰC HIỂN THỊ
@@ -96,16 +102,21 @@ class MiniPhotoshop(QMainWindow):
             return
 
         brightness = self.control_panel.slider_bright.value()      
-        contrast = self.control_panel.slider_contrast.value() / 10.0 
-        blur_val = self.control_panel.slider_blur.value()            
+        contrast = self.control_panel.slider_contrast.value() / 10.0
+
+        blur_size_val = self.control_panel.slider_blur_size.value()
+        blur_sigma_val = self.control_panel.slider_blur_sigma.value() / 10.0
+
         is_hist = self.control_panel.btn_hist.isChecked()
 
         img = self.original_cv_img.copy()
+        # 1. Điều chỉnh độ sáng / tương phản
         img = cv2.convertScaleAbs(img, alpha=contrast, beta=brightness)
-
-        if blur_val > 1:
-            ksize = blur_val if blur_val % 2 != 0 else blur_val + 1
-            img = cv2.GaussianBlur(img, (ksize, ksize), 0)
+        # 2. Xử lý Blur khi Size > 1
+        if blur_size_val > 1:
+            ksize = blur_size_val if blur_size_val % 2 != 0 else blur_size_val + 1
+            img = blur_color(img, size=ksize, sigma=blur_sigma_val)
+        # 3. Cân bằng Histogram
         if is_hist:
             if len(img.shape) == 3:
                 ycrcb = cv2.cvtColor(img, cv2.COLOR_BGR2YCrCb)
@@ -113,7 +124,7 @@ class MiniPhotoshop(QMainWindow):
                 img = cv2.cvtColor(ycrcb, cv2.COLOR_YCrCb2BGR)
             else:
                 img = cv2.equalizeHist(img)
-
+        # 4. Hiển thị lại kết quả
         self.processed_cv_img = img
         pix_proc = self.cv2_to_qpixmap(self.processed_cv_img)
         self.render_pixmap_to_label(pix_proc, self.display_panel.lbl_proc)
