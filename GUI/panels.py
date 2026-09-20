@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt
 
+# STYLESHEET HIỆN ĐẠI & TINH TẾ (CATPPUCCIN MOCHA / MODERN DARK)
 STYLE_SHEET = """
 QMainWindow {
     background-color: #11111b;
@@ -187,24 +188,42 @@ class ControlPanel(QWidget):
         adj_layout.addLayout(contrast_header)
         adj_layout.addWidget(self.slider_contrast)
 
-        # Blur
-        blur_header = QHBoxLayout()
-        blur_header.addWidget(QLabel("Độ Mờ (Blur):"))
-        self.lbl_blur_val = QLabel("1")
-        self.lbl_blur_val.setAlignment(Qt.AlignRight)
-        self.lbl_blur_val.setStyleSheet("color: #89b4fa; font-weight: bold;")
-        blur_header.addWidget(self.lbl_blur_val)
+        # --- 1. Blur Kernel Size ---
+        blur_size_header = QHBoxLayout()
+        blur_size_header.addWidget(QLabel("Độ Mờ - Kích Thước (Size):"))
+        self.lbl_blur_size_val = QLabel("1")
+        self.lbl_blur_size_val.setAlignment(Qt.AlignRight)
+        self.lbl_blur_size_val.setStyleSheet("color: #89b4fa; font-weight: bold;")
+        blur_size_header.addWidget(self.lbl_blur_size_val)
 
-        self.slider_blur = QSlider(Qt.Horizontal)
-        self.slider_blur.setRange(1, 25)
-        self.slider_blur.setValue(1)
-        self.slider_blur.valueChanged.connect(
-            lambda v: self.lbl_blur_val.setText(str(v))
+        self.slider_blur_size = QSlider(Qt.Horizontal)
+        self.slider_blur_size.setRange(1, 25) # Size từ 1 đến 25
+        self.slider_blur_size.setValue(1)
+        self.slider_blur_size.valueChanged.connect(
+            lambda v: self.lbl_blur_size_val.setText(str(v if v % 2 != 0 else v + 1))
         )
 
-        adj_layout.addLayout(blur_header)
-        adj_layout.addWidget(self.slider_blur)
+        adj_layout.addLayout(blur_size_header)
+        adj_layout.addWidget(self.slider_blur_size)
 
+        # --- 2. Blur Sigma ---
+        blur_sigma_header = QHBoxLayout()
+        blur_sigma_header.addWidget(QLabel("Độ Mờ - Độ Lan Tỏa (Sigma):"))
+        self.lbl_blur_sigma_val = QLabel("0.0")
+        self.lbl_blur_sigma_val.setAlignment(Qt.AlignRight)
+        self.lbl_blur_sigma_val.setStyleSheet("color: #89b4fa; font-weight: bold;")
+        blur_sigma_header.addWidget(self.lbl_blur_sigma_val)
+
+        self.slider_blur_sigma = QSlider(Qt.Horizontal)
+        self.slider_blur_sigma.setRange(0, 100) # Quy đổi 0 đến 100 thành 0.0 đến 10.0
+        self.slider_blur_sigma.setValue(0)
+        self.slider_blur_sigma.valueChanged.connect(
+            lambda v: self.lbl_blur_sigma_val.setText(f"{v / 10.0:.1f}")
+        )
+
+        adj_layout.addLayout(blur_sigma_header)
+        adj_layout.addWidget(self.slider_blur_sigma)
+        
         # Histogram Button
         self.btn_hist = QPushButton("📊  Cân Bằng Histogram")
         self.btn_hist.setCheckable(True)
@@ -253,7 +272,7 @@ class DisplayPanel(QWidget):
         self.lbl_proc.setMinimumSize(380, 280)
         self.lbl_proc.setProperty("class", "image-card")
 
-        self.histogram_label = QLabel("Biểu Đồ Histogram")
+        self.histogram_label = QLabel("Histogram sẽ hiển thị ở đây")
         self.histogram_label.setAlignment(Qt.AlignCenter)
         self.histogram_label.setMinimumSize(780, 140)
         self.histogram_label.setProperty("class", "image-card")
