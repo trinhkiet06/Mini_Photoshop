@@ -13,10 +13,6 @@ from PyQt5.QtGui import QPixmap, QImage
 
 from GUI.panels1 import ControlPanel, DisplayPanel, STYLE_SHEET
 
-# Giả sử các hàm xử lý thuật toán của bạn nằm trong package Processing
-# Ví dụ: from Processing.enhancement import adjust_brightness_contrast, apply_blur, equalize_histogram
-
-
 class MiniPhotoshop(QMainWindow):
     def __init__(self):
         super().__init__()
