@@ -12,7 +12,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QHBoxLayout, QFi
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QPixmap, QImage
 
-from GUI.panels1 import ControlPanel, DisplayPanel, STYLE_SHEET
+from GUI.panels import ControlPanel, DisplayPanel, STYLE_SHEET
 
 # Giả sử các hàm xử lý thuật toán của bạn nằm trong package Processing
 # Ví dụ: from Processing.enhancement import adjust_brightness_contrast, apply_blur, equalize_histogram
